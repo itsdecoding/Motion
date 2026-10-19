@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carousel Studio</title>
+<style>
+@font-face { font-family: "Jakarta"; src: url(/fonts/plus-jakarta-sans-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+@font-face { font-family: "Jakarta"; src: url(/fonts/plus-jakarta-sans-latin-600-normal.woff2) format("woff2"); font-weight: 600; }
+@font-face { font-family: "Jakarta"; src: url(/fonts/plus-jakarta-sans-latin-800-normal.woff2) format("woff2"); font-weight: 800; }
+@font-face { font-family: "Instrument Serif"; src: url(/fonts/instrument-serif-latin-400-italic.woff2) format("woff2"); font-style: italic; }
+:root { --paper: #ECEAE4; --carbon: #17181B; --muted: #5C5D63; --soft: #B9B8BE; --lime: #D2F84C; --line: #C9C7C0; --ok-bg: #EAF6C4; --ok: #3A4A0B; --bad-bg: #F8DEDC; --bad: #8C2A24; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Jakarta", system-ui, sans-serif; background: var(--paper); color: var(--carbon); }
+a { color: inherit; }
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 40px; background: var(--carbon); color: var(--paper); }
+.logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; text-decoration: none; }
+.mark { width: 36px; height: 36px; border-radius: 10px; background: var(--lime); display: grid; place-items: center; }
+nav { display: flex; flex-wrap: wrap; gap: 8px; }
+nav a { padding: 10px 16px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px; }
+nav a.on { background: var(--lime); color: var(--carbon); }
+main { max-width: 1200px; margin: 0 auto; padding: 40px; display: flex; flex-direction: column; gap: 28px; }
+.row { display: flex; flex-wrap: wrap; gap: 24px; }
+.wide { flex: 999 1 560px; min-width: 0; }
+.side { flex: 1 1 320px; min-width: 0; }
+.card { background: #FFF; border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 18px; }
+.card.dark { background: var(--carbon); color: var(--paper); }
+h1 { margin: 0; font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+h2 { margin: 0; font-size: 20px; font-weight: 800; }
+.serif { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-weight: 400; }
+.muted { color: var(--muted); margin: 0; line-height: 1.5; }
+.dark .muted { color: var(--soft); }
+label, .label { font-weight: 600; font-size: 14px; }
+input, select, textarea { font: inherit; font-size: 16px; color: var(--carbon); background: #FFF; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; width: 100%; }
+textarea { resize: vertical; line-height: 1.5; }
+button, .button { font: inherit; font-weight: 600; font-size: 15px; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1px solid var(--carbon); background: transparent; color: var(--carbon); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+button.primary, .button.primary { background: var(--carbon); color: var(--lime); font-weight: 800; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.small { min-height: 44px; padding: 0 16px; font-size: 14px; border-color: var(--line); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-head { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.count { color: var(--muted); }
+.line-row { display: flex; gap: 8px; }
+.segs { display: inline-flex; gap: 4px; background: var(--paper); padding: 4px; border-radius: 12px; align-self: flex-start; }
+.seg { border: none; border-radius: 9px; min-height: 44px; color: var(--muted); }
+.seg.on { background: #FFF; color: var(--carbon); }
+.stepper { display: flex; align-items: center; gap: 8px; }
+.stepper input { width: 72px; text-align: center; font-weight: 600; }
+.stepper button { width: 44px; padding: 0; border-color: var(--line); border-radius: 12px; font-size: 20px; }
+.swatches { display: flex; gap: 6px; }
+.swatches span { width: 24px; height: 24px; border-radius: 999px; border: 1px solid var(--line); }
+.between { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill { font-size: 13px; font-weight: 600; padding: 6px 10px; border-radius: 999px; background: var(--paper); color: var(--muted); }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.steps { display: flex; flex-direction: column; gap: 16px; }
+.step { display: flex; gap: 14px; }
+.step b { flex: none; width: 28px; height: 28px; border-radius: 999px; background: var(--lime); color: var(--carbon); display: grid; place-items: center; font-size: 14px; }
+.list-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-decoration: none; padding: 12px 0; border-bottom: 1px solid var(--paper); }
+.list-link:last-child { border-bottom: none; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+.slide { display: flex; flex-direction: column; gap: 10px; }
+.frame { position: relative; aspect-ratio: 4 / 5; border-radius: 14px; overflow: hidden; background: #FFF; }
+.frame iframe { width: 100%; height: 100%; border: 0; pointer-events: none; }
+.frame button { position: absolute; inset: 0; border: none; border-radius: 14px; background: transparent; min-height: 0; }
+.slide.on .frame { outline: 3px solid var(--carbon); outline-offset: 3px; }
+.slide-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 600; }
+.check { display: flex; gap: 12px; align-items: flex-start; }
+.check i { flex: none; width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 14px; background: var(--ok-bg); color: var(--ok); }
+.check.bad i { background: var(--bad-bg); color: var(--bad); }
+.check small { display: block; color: var(--bad); font-size: 13px; margin-top: 4px; }
+.error { color: var(--bad); margin: 0; font-weight: 600; white-space: pre-line; }
+.error:empty { display: none; }
+.banner { background: var(--bad-bg); color: var(--bad); border-radius: 14px; padding: 16px 20px; font-weight: 600; line-height: 1.5; }
+.log { font-size: 14px; color: var(--muted); margin: 0; padding-left: 18px; line-height: 1.6; white-space: pre-wrap; }
+.spinner { width: 28px; height: 28px; border: 3px solid var(--line); border-top-color: var(--carbon); border-radius: 50%; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.video-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--paper); }
+.video-row:last-child { border-bottom: none; }
+.video-row video { width: 64px; aspect-ratio: 4 / 5; border-radius: 8px; background: var(--paper); object-fit: cover; }
+.video-row div { flex: 1 1 200px; }
+@media (max-width: 640px) { header, main { padding: 20px; } .card { padding: 22px; } h1 { font-size: 28px; } }
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#/"><span class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#17181B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="12" height="14" rx="2"/><path d="M19 7v10"/><path d="M22 9v6"/></svg></span>Carousel Studio</a>
+  <nav aria-label="Main"><a href="#/" data-page="new">New carousel</a><a href="#/list" data-page="list">My carousels</a></nav>
+</header>
+<main id="view"></main>
+<script>
+const view = document.getElementById("view");
+const TYPE_LABELS = { cover_hero: "Cover", word_stagger: "Statement", comparison_split: "Before / after", outro_cta: "Closing" };
+const FIELD_LABELS = { badge: "Small label", headline: "Headline", headline_accent: "Accent line", subline: "Subline", lines: "Lines", body: "Body text", title: "Title", old_label: "Old way label", new_label: "New way label", old_points: "Old way points", new_points: "New way points", cta: "Call to action", note: "Note" };
+const CHECKS = [["overflow", "Text fits in its box"], ["bounds", "Nothing cut off at the edges"], ["overlap", "No overlapping text"], ["contrast", "Easy to read (colour contrast)"], ["determinism", "Plays the same way every time"]];
+let timer = null;
+let slideTypes = null;
+
+function h(tag, props = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const [key, value] of Object.entries(props)) {
+    if (value == null || value === false) continue;
+    if (key.startsWith("on")) el.addEventListener(key.slice(2), value);
+    else if (key === "class") el.className = value;
+    else if (key === "value" || key === "muted") el[key] = value;
+    else el.setAttribute(key, value === true ? "" : value);
+  }
+  return fill(el, ...children);
+}
+
+function fill(el, ...children) {
+  el.replaceChildren(...children.flat().filter((c) => c != null && c !== false));
+  return el;
+}
+
+function show(...nodes) { fill(view, ...nodes); }
+const busy = (job) => job && (job.status === "waiting" || job.status === "running");
+const errorCard = (message) => h("div", { class: "card" }, h("h2", {}, "Something went wrong"), h("p", { class: "error" }, message), h("a", { href: "#/", class: "button" }, "Back to start"));
+
+function errorText(body) {
+  if (!body) return "";
+  if (typeof body.detail === "string") return body.detail;
+  if (Array.isArray(body.detail)) return body.detail.map((e) => `${e.loc.slice(1).join(" › ")}: ${e.msg}`).join("\n");
+  return "";
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...options });
+  const body = (res.headers.get("content-type") || "").includes("json") ? await res.json() : null;
+  if (!res.ok) throw new Error(errorText(body) || `Request failed (${res.status})`);
+  return body;
+}
+
+function progressCard(title, job) {
+  return h("div", { class: "card" },
+    h("div", { class: "between" }, h("h2", {}, title), h("div", { class: "spinner", "aria-hidden": "true" })),
+    h("p", { class: "muted" }, job.status === "waiting" ? "Waiting for another job to finish first." : "You can leave this page; the work keeps going."),
+    h("ul", { class: "log", "aria-live": "polite" }, job.log.slice(-8).map((line) => h("li", {}, line))));
+}
+
+async function route() {
+  clearTimeout(timer);
+  const [, page, id, sub] = location.hash.split("/");
+  const section = page === "c" || page === "list" ? "list" : "new";
+  document.querySelectorAll("nav a").forEach((a) => a.classList.toggle("on", a.dataset.page === section));
+  try {
+    if (page === "c" && sub === "videos") await downloadView(id);
+    else if (page === "c") await reviewView(id);
+    else if (page === "list") await listView();
+    else await createView();
+  } catch (e) {
+    show(errorCard(e.message));
+  }
+}
+
+function carouselLinks(carousels) {
+  if (!carousels.length) return h("p", { class: "muted" }, "No carousels yet.");
+  return h("div", {}, carousels.map((c) => h("a", { class: "list-link", href: `#/c/${c.id}` },
+    h("div", {}, h("div", { style: "font-weight:600" }, c.title), h("div", { class: "muted", style: "font-size:14px" }, `${c.slides} slides · ${c.brand}`)),
+    h("span", { class: c.busy ? "pill" : "pill ok" }, c.busy ? "Working" : "Open"))));
+}
+
+async function createView() {
+  const [brands, carousels] = await Promise.all([api("/api/brands"), api("/api/carousels")]);
+  let mode = "topic";
+  const brand = h("select", { id: "brand" }, brands.map((b) => h("option", { value: b.id }, `${b.name} (${b.handle})`)));
+  const swatches = h("div", { class: "swatches", "aria-hidden": "true" });
+  const paint = () => {
+    const palette = brands.find((b) => b.id === brand.value).palette;
+    fill(swatches, ...["carbon", "paper", "highlight", "glow"].map((k) => h("span", { style: `background:${palette[k]}` })));
+  };
+  brand.addEventListener("change", paint);
+  paint();
+
+  const source = h("textarea", { id: "source", rows: 4, placeholder: "e.g. Why cold email volume backfires" });
+  const sourceLabel = h("label", { for: "source" }, "What should it be about?");
+  const modes = [["topic", "A topic"], ["script", "My own script"]];
+  const segs = modes.map(([key, label]) => h("button", { type: "button", class: key === mode ? "seg on" : "seg", "aria-pressed": String(key === mode), onclick: () => setMode(key) }, label));
+  function setMode(key) {
+    mode = key;
+    segs.forEach((seg, i) => { const on = modes[i][0] === key; seg.classList.toggle("on", on); seg.setAttribute("aria-pressed", String(on)); });
+    source.rows = key === "script" ? 12 : 4;
+    sourceLabel.textContent = key === "script" ? "Paste your script or outline" : "What should it be about?";
+    source.placeholder = key === "script" ? "Your script, notes or outline…" : "e.g. Why cold email volume backfires";
+  }
+
+  const count = h("input", { id: "count", type: "number", min: 2, max: 15, value: 6 });
+  const step = (d) => { count.value = Math.min(15, Math.max(2, (Number(count.value) || 6) + d)); };
+  const error = h("p", { class: "error", role: "alert" });
+  const create = h("button", { type: "button", class: "primary", onclick: async () => {
+    error.textContent = "";
+    const slides = Number(count.value);
+    if (!source.value.trim()) { error.textContent = mode === "script" ? "Paste your script first." : "Type a topic first."; return; }
+    if (!Number.isInteger(slides) || slides < 2 || slides > 15) { error.textContent = "Choose between 2 and 15 slides."; return; }
+    create.disabled = true;
+    try {
+      const { id } = await api("/api/carousels", { method: "POST", body: JSON.stringify({ brand: brand.value, source: source.value.trim(), slides }) });
+      location.hash = `#/c/${id}`;
+    } catch (e) {
+      error.textContent = e.message;
+      create.disabled = false;
+    }
+  } }, "Create carousel →");
+  source.addEventListener("input", () => { error.textContent = ""; });
+
+  show(h("div", { class: "row" },
+    h("section", { class: "card wide" },
+      h("div", {}, h("h1", {}, "New carousel. ", h("span", { class: "serif" }, "Just the idea.")),
+        h("p", { class: "muted", style: "margin-top:8px" }, "Tell us what it’s about. We’ll write it, design it, check it, and turn it into videos.")),
+      h("div", { class: "field" }, h("label", { for: "brand" }, "Brand"), h("div", { class: "between" }, h("div", { style: "flex:1 1 240px" }, brand), swatches)),
+      h("div", { class: "field" }, h("span", { class: "label" }, "Start from"), h("div", { class: "segs" }, segs)),
+      h("div", { class: "field" }, sourceLabel, source),
+      h("div", { class: "between", style: "align-items:flex-end" },
+        h("div", { class: "field" }, h("label", { for: "count" }, "Number of slides"),
+          h("div", { class: "stepper" }, h("button", { type: "button", "aria-label": "Fewer slides", onclick: () => step(-1) }, "−"), count, h("button", { type: "button", "aria-label": "More slides", onclick: () => step(1) }, "+"))),
+        create),
+      error),
+    h("aside", { class: "side", style: "display:flex;flex-direction:column;gap:24px" },
+      h("div", { class: "card dark" }, h("h2", {}, "What happens next"),
+        h("div", { class: "steps" }, [["AI writes the slides", "In your brand’s voice"], ["Slides are designed", "Animated, in your colours"], ["Quality check", "Text that doesn’t fit or is hard to read gets fixed"], ["You review, then download", "One video per slide, ready for Instagram"]]
+          .map(([title, text], i) => h("div", { class: "step" }, h("b", {}, String(i + 1)), h("div", {}, h("div", { style: "font-weight:600" }, title), h("p", { class: "muted", style: "font-size:14px" }, text)))))),
+      h("div", { class: "card" }, h("h2", {}, "Recent"), carouselLinks(carousels.slice(0, 5))))));
+}
+
+async function listView() {
+  const carousels = await api("/api/carousels");
+  show(h("div", { class: "card" }, h("h1", {}, "My carousels"), carouselLinks(carousels)));
+}
+
+function textField(label, value, max, optional, onChange) {
+  const id = `f${Math.random().toString(36).slice(2)}`;
+  const long = max > 60;
+  const input = h(long ? "textarea" : "input", { id, maxlength: max, rows: long ? 2 : null, value: value ?? "" });
+  const counter = h("span", { class: "count" }, `${(value ?? "").length} / ${max}`);
+  input.addEventListener("input", () => { counter.textContent = `${input.value.length} / ${max}`; onChange(input.value); });
+  return h("div", { class: "field" }, h("div", { class: "field-head" }, h("label", { for: id }, optional ? `${label} (optional)` : label), counter), input);
+}
+
+function listField(label, slide, name, spec, onChange) {
+  const box = h("div", { class: "field" });
+  const paint = () => {
+    const items = slide[name];
+    fill(box,
+      h("div", { class: "field-head" }, h("span", { class: "label" }, label), h("span", { class: "count" }, `${items.length} of ${spec.minItems}–${spec.maxItems}, up to ${spec.max} characters each`)),
+      ...items.map((item, i) => h("div", { class: "line-row" },
+        h("input", { value: item, maxlength: spec.max, "aria-label": `${label} ${i + 1}`, oninput: (e) => { items[i] = e.target.value; onChange(); } }),
+        items.length > spec.minItems && h("button", { type: "button", class: "small", "aria-label": `Remove ${label} ${i + 1}`, onclick: () => { items.splice(i, 1); onChange(); paint(); } }, "Remove"))),
+      items.length < spec.maxItems && h("button", { type: "button", class: "small", style: "align-self:flex-start", onclick: () => { items.push(""); onChange(); paint(); } }, "+ Add"));
+  };
+  paint();
+  return box;
+}
+
+function fieldSpec(prop) {
+  if (prop.type === "array") return { kind: "list", max: prop.items.maxLength, minItems: prop.minItems, maxItems: prop.maxItems };
+  if (prop.anyOf) return { kind: "text", max: prop.anyOf.find((o) => o.type === "string").maxLength, optional: true };
+  return { kind: "text", max: prop.maxLength, optional: false };
+}
+
+async function reviewView(id) {
+  const [data, types] = await Promise.all([api(`/api/carousels/${id}`), slideTypes || api("/api/slide-types")]);
+  slideTypes = types;
+  const job = data.job;
+  if (busy(job) && job.kind === "render") { location.hash = `#/c/${id}/videos`; return; }
+  if (busy(job)) { show(progressCard("Writing and checking your slides", job)); timer = setTimeout(route, 2000); return; }
+  if (!data.carousel) { show(errorCard(job?.error || "This carousel has no slides.")); return; }
+
+  const draft = structuredClone(data.carousel);
+  let issues = data.issues;
+  let selected = 0;
+  let dirty = false;
+  let stamp = Date.now();
+  const failedGenerate = job?.status === "failed" && job.kind === "generate";
+  const top = h("div");
+  const grid = h("div", { class: "grid" });
+  const editor = h("section", { class: "card wide" });
+  const qa = h("aside", { class: "card side" });
+
+  const markDirty = () => { if (!dirty) { dirty = true; paintTop(); } };
+
+  async function save(button) {
+    const error = editor.querySelector(".error");
+    error.textContent = "";
+    button.disabled = true;
+    try {
+      issues = (await api(`/api/carousels/${id}`, { method: "PUT", body: JSON.stringify(draft) })).issues;
+      data.slides = (await api(`/api/carousels/${id}`)).slides;
+      dirty = false;
+      stamp = Date.now();
+      paintAll();
+    } catch (e) {
+      error.textContent = e.message;
+      button.disabled = false;
+    }
+  }
+
+  function paintTop() {
+    const status = issues === null ? h("span", { class: "pill" }, "Not checked yet")
+      : issues.length ? h("span", { class: "pill bad" }, `${issues.length} problem${issues.length > 1 ? "s" : ""} to fix`)
+      : h("span", { class: "pill ok" }, "All quality checks passed");
+    const blocked = dirty || issues === null || issues.length > 0;
+    const error = h("p", { class: "error", role: "alert" });
+    const rewrite = data.can_rewrite && h("button", { type: "button", onclick: async () => {
+      if (!confirm("This replaces every slide with a new version from the AI. Continue?")) return;
+      try { await api(`/api/carousels/${id}/rewrite`, { method: "POST" }); route(); } catch (e) { error.textContent = e.message; }
+    } }, "Rewrite all with AI");
+    const make = h("button", { type: "button", class: "primary", disabled: blocked, onclick: async () => {
+      make.disabled = true;
+      try { await api(`/api/carousels/${id}/render`, { method: "POST" }); location.hash = `#/c/${id}/videos`; } catch (e) { error.textContent = e.message; make.disabled = false; }
+    } }, "Make videos →");
+    fill(top, h("div", { class: "between" },
+      h("div", { style: "display:flex;flex-direction:column;gap:8px" }, h("h1", { style: "font-size:32px" }, draft.title),
+        h("div", { class: "buttons", style: "align-items:center;font-size:14px" }, h("span", { class: "muted" }, `${draft.brand.name} · ${draft.slides.length} slides`), status)),
+      h("div", { style: "display:flex;flex-direction:column;gap:8px;align-items:flex-end" },
+        h("div", { class: "buttons" }, rewrite, make),
+        h("span", { class: "muted", style: "font-size:13px" }, dirty ? "Save your changes before making videos." : issues?.length ? "Fix the problems before making videos." : ""),
+        error)),
+      failedGenerate && h("div", { class: "banner", style: "margin-top:20px" }, issues?.length
+        ? "The AI’s slides didn’t pass the quality check. Fix the problems below, or press “Rewrite all with AI”."
+        : job.error));
+  }
+
+  function paintGrid() {
+    fill(grid, ...draft.slides.map((slide, i) => {
+      const problems = (issues || []).filter((issue) => issue.slide === i + 1).length;
+      return h("div", { class: i === selected ? "slide on" : "slide" },
+        h("div", { class: "frame" },
+          data.slides[i].html
+            ? h("iframe", { src: `${data.slides[i].html}?v=${stamp}`, title: `Slide ${i + 1} preview`, loading: "lazy", tabindex: "-1" })
+            : h("p", { class: "muted", style: "padding:20px;font-size:14px" }, "Press “Save and check again” to see this slide."),
+          h("button", { type: "button", "aria-label": `Edit slide ${i + 1}`, onclick: () => { selected = i; paintGrid(); paintEditor(); } })),
+        h("div", { class: "slide-meta" }, h("span", {}, `${i + 1} · ${TYPE_LABELS[slide.type] || slide.type}`),
+          problems ? h("span", { style: "color:var(--bad)" }, `${problems} to fix`) : h("span", { class: "count" }, `${slide.duration} s`)));
+    }));
+  }
+
+  function paintEditor() {
+    const slide = draft.slides[selected];
+    const fields = [];
+    for (const [name, prop] of Object.entries(slideTypes[slide.type].properties)) {
+      if (name === "type" || name === "duration") continue;
+      const spec = fieldSpec(prop);
+      const label = FIELD_LABELS[name] || prop.title;
+      fields.push(spec.kind === "list"
+        ? listField(label, slide, name, spec, markDirty)
+        : textField(label, slide[name], spec.max, spec.optional, (value) => { slide[name] = spec.optional && !value.trim() ? null : value; markDirty(); }));
+    }
+    const duration = slideTypes[slide.type].properties.duration;
+    const length = h("input", { id: "duration", type: "number", min: duration.minimum, max: duration.maximum, step: 0.5, value: slide.duration, style: "width:110px",
+      oninput: (e) => { slide.duration = Number(e.target.value); markDirty(); } });
+    const saveButton = h("button", { type: "button", class: "primary", onclick: () => save(saveButton) }, "Save changes");
+    fill(editor,
+      h("div", { class: "between" }, h("h2", {}, `Edit slide ${selected + 1} · ${TYPE_LABELS[slide.type] || slide.type}`),
+        data.slides[selected].html && h("a", { class: "button small", href: data.slides[selected].html, target: "_blank", rel: "noopener" }, "▶ Play full size")),
+      ...fields,
+      h("div", { class: "between", style: "align-items:flex-end" },
+        h("div", { class: "field" }, h("label", { for: "duration" }, `Length in seconds (${duration.minimum}–${duration.maximum})`), length),
+        saveButton),
+      h("p", { class: "error", role: "alert" }));
+  }
+
+  function paintQa() {
+    const recheck = h("button", { type: "button", class: "small", onclick: () => save(recheck) }, "Save and check again");
+    fill(qa, h("h2", {}, "Quality check"),
+      h("p", { class: "muted", style: "font-size:14px" }, "Runs automatically every time you save. No AI, no cost."),
+      issues === null ? h("p", { class: "muted" }, "Not checked yet.")
+        : CHECKS.map(([check, label]) => {
+          const found = issues.filter((issue) => issue.check === check);
+          return h("div", { class: found.length ? "check bad" : "check" }, h("i", { "aria-hidden": "true" }, found.length ? "!" : "✓"),
+            h("div", {}, h("span", {}, label), found.map((issue) => h("small", {}, `Slide ${issue.slide}: ${issue.element} (${issue.detail})`))));
+        }),
+      recheck);
+  }
+
+  function paintAll() { paintTop(); paintGrid(); paintEditor(); paintQa(); }
+  paintAll();
+  show(top, grid, h("div", { class: "row" }, editor, qa));
+}
+
+async function downloadView(id) {
+  const data = await api(`/api/carousels/${id}`);
+  const job = data.job;
+  if (!data.carousel) { show(errorCard(job?.error || "This carousel has no slides.")); return; }
+  const back = h("a", { href: `#/c/${id}`, class: "muted", style: "font-weight:600;text-decoration:none;min-height:44px;display:inline-flex;align-items:center" }, "← Back to editing");
+  const heading = h("div", {}, h("h1", {}, "Your videos. ", h("span", { class: "serif" }, data.carousel.title)));
+  if (busy(job) && job.kind === "render") {
+    show(back, heading, progressCard(`Making ${data.slides.length} videos`, job));
+    timer = setTimeout(route, 3000);
+    return;
+  }
+  if (busy(job)) { location.hash = `#/c/${id}`; return; }
+  const failed = job?.status === "failed" && job.kind === "render" && h("div", { class: "banner" }, job.error);
+  const ready = data.slides.every((slide) => slide.video);
+  if (!ready) {
+    const error = h("p", { class: "error", role: "alert" });
+    const make = h("button", { type: "button", class: "primary", disabled: !(data.issues && data.issues.length === 0), onclick: async () => {
+      make.disabled = true;
+      try { await api(`/api/carousels/${id}/render`, { method: "POST" }); route(); } catch (e) { error.textContent = e.message; make.disabled = false; }
+    } }, "Make videos →");
+    show(back, heading, failed, h("div", { class: "card" }, h("h2", {}, "No videos yet"),
+      h("p", { class: "muted" }, data.issues?.length === 0 ? "Your slides passed the quality check." : "Fix the quality problems on the review page first."), h("div", {}, make), error));
+    return;
+  }
+  show(back, heading, h("div", { class: "card", style: "padding:8px 32px" }, data.slides.map((slide, i) => h("div", { class: "video-row" },
+    h("video", { src: slide.video, muted: true, loop: true, autoplay: true, playsinline: true, "aria-label": `Slide ${i + 1} video` }),
+    h("div", {}, h("div", { style: "font-weight:600" }, `${i + 1} · ${TYPE_LABELS[data.carousel.slides[i].type] || data.carousel.slides[i].type}`),
+      h("div", { class: "muted", style: "font-size:14px" }, `MP4 · 1080 × 1350 · ${data.carousel.slides[i].duration} s`)),
+    h("a", { class: "button small", href: slide.video, download: `${slide.stem}.mp4` }, "Download")))),
+    h("div", { style: "display:flex;justify-content:flex-end" }, h("a", { class: "button primary", href: `/api/carousels/${id}/videos.zip` }, "Download all (.zip)")));
+}
+
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>

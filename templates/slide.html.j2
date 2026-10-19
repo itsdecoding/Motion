@@ -1,0 +1,114 @@
+{% import "primitives/" ~ slide.type ~ ".html.j2" as primitive %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ index }}/{{ total }} – {{ carousel.title }}</title>
+<style>
+{{ font_css|safe }}
+:root {
+  --paper: {{ palette.paper }};
+  --carbon: {{ palette.carbon }};
+  --ink: {{ palette.ink }};
+  --muted: {{ palette.muted }};
+  --highlight: {{ palette.highlight }};
+  --glow: {{ palette.glow }};
+  --negative: {{ palette.negative }};
+  --bg: {{ theme.bg }};
+  --fg: {{ theme.fg }};
+  --soft: {{ theme.soft }};
+  --line: {{ theme.line }};
+  --surface: {{ theme.surface }};
+  --halo: {{ theme.halo }};
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; animation: none !important; transition: none !important; }
+html, body { width: {{ width }}px; height: {{ height }}px; overflow: hidden; background: var(--bg); }
+.canvas {
+  width: {{ width }}px; height: {{ height }}px;
+  padding: 76px 88px 72px;
+  display: flex; flex-direction: column; gap: 44px;
+  background-color: var(--bg); color: var(--fg);
+  font-family: "Jakarta", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.canvas.dark { background-image: radial-gradient(circle at 78% 24%, var(--halo) 0%, transparent 58%); }
+.chrome { display: flex; align-items: center; justify-content: space-between; gap: 32px; font-size: 26px; font-weight: 600; color: var(--soft); }
+.track { flex: 1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.fill { height: 100%; background: var(--fg); transform-origin: left center; }
+.stage { flex: 1; min-height: 0; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.headline { font-weight: 800; font-size: 104px; line-height: 0.98; letter-spacing: -0.035em; }
+.accent { font-family: "Instrument Serif", serif; font-style: italic; font-weight: 400; font-size: 116px; line-height: 1.02; letter-spacing: -0.01em; }
+.body { font-size: 36px; line-height: 1.42; color: var(--soft); max-width: 24em; }
+{{ primitive.style() }}
+</style>
+</head>
+<body>
+<main class="canvas{{ ' dark' if slide.dark }}">
+  <header class="chrome">
+    <span data-qa="handle">{{ brand.handle }}</span>
+    <span data-qa="page">{{ index }}/{{ total }}</span>
+  </header>
+  <section class="stage" data-qa="stage">
+{{ primitive.markup(slide) }}
+  </section>
+  <footer class="chrome">
+    <span data-qa="brand">{{ brand.name }}</span>
+    <div class="track"><div class="fill" id="progress"></div></div>
+  </footer>
+</main>
+<script>
+const DURATION = {{ slide.duration }};
+const S = {{ starts|tojson }};
+const $ = (name) => document.querySelector(`[data-qa="${name}"]`);
+const clamp = (x, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, x));
+const loopWave = (t, hz) => Math.sin(2 * Math.PI * Math.max(1, Math.round(hz * DURATION)) * t / DURATION);
+const loopTurns = (t, degPerSec) => 360 * Math.max(1, Math.round(degPerSec * DURATION / 360)) * t / DURATION;
+
+function spring(t, k = 260, c = 20) {
+  if (t <= 0) return 0;
+  const w0 = Math.sqrt(k), z = c / (2 * w0), wd = w0 * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w0 * t) * (Math.cos(wd * t) + (z * w0 / wd) * Math.sin(wd * t));
+}
+
+function enter(el, p, y = 40, blur = 0) {
+  if (!el) return;
+  const b = Math.max(0, 1 - p) * blur;
+  el.style.opacity = clamp(p);
+  el.style.transform = `translateY(${(1 - p) * y}px)`;
+  el.style.filter = b > 0.01 ? `blur(${b}px)` : "none";
+}
+
+function orbit(t, start) {
+  const o = document.querySelector(".orbit");
+  if (!o) return;
+  o.style.transform = `scale(${0.6 + 0.4 * spring(t - start, 180, 18)})`;
+  o.style.opacity = clamp(spring(t - start, 180, 18));
+  o.querySelector(".ring-a").setAttribute("transform", `rotate(${loopTurns(t, 24)})`);
+  o.querySelector(".ring-b").setAttribute("transform", `rotate(${-loopTurns(t, 40)})`);
+  o.querySelector(".core").setAttribute("transform", `scale(${1 + 0.045 * loopWave(t, 0.51)})`);
+}
+
+{{ primitive.script(slide) }}
+
+window.seek = (t) => {
+  const loopT = ((t % DURATION) + DURATION) % DURATION;
+  document.getElementById("progress").style.transform = `scaleX(${loopT / DURATION})`;
+  stage(loopT);
+};
+
+window.__ready = async () => {
+  await Promise.all([...document.fonts].map((f) => f.load().catch(() => null)));
+  await document.fonts.ready;
+  window.seek(0);
+  return [...document.fonts].filter((f) => f.status !== "loaded").map((f) => `${f.family} ${f.weight} ${f.style}`);
+};
+
+if (!navigator.webdriver) {
+  document.documentElement.style.zoom = Math.min(1, innerWidth / {{ width }}, innerHeight / {{ height }});
+  const t0 = performance.now();
+  const tick = () => { window.seek((performance.now() - t0) / 1000); requestAnimationFrame(tick); };
+  tick();
+}
+</script>
+</body>
+</html>

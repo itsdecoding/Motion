@@ -1,0 +1,32 @@
+{% from "partials/orbit.html.j2" import orbit %}
+{% macro style() %}
+.outro { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; }
+.outro .orbit { margin-bottom: 36px; }
+.outro .accent { color: var(--highlight); }
+.outro .cta { margin-top: 48px; padding: 30px 56px; border-radius: 999px; background: var(--highlight); color: var(--carbon); font-size: 42px; font-weight: 800; letter-spacing: -0.01em; }
+.outro .body { margin-top: 16px; }
+{% endmacro %}
+
+{% macro markup(s) %}
+<div class="outro">
+  {{ orbit(220) }}
+  <h2 class="headline" data-qa="headline">{{ s.headline }}</h2>
+  <p class="accent" data-qa="accent">{{ s.headline_accent }}</p>
+  <p class="cta" data-qa="cta">{{ s.cta }}</p>
+  {% if s.note %}<p class="body" data-qa="note">{{ s.note }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro script(s) %}
+function stage(t) {
+  orbit(t, S.orbit);
+  enter($("headline"), spring(t - S.headline), 56, 14);
+  enter($("accent"), spring(t - S.accent), 56, 14);
+  const cta = $("cta"), p = spring(t - S.cta, 220, 16), settled = clamp((t - S.cta) / 0.6);
+  cta.style.opacity = clamp(p);
+  cta.style.transform = `translateY(${(1 - p) * 32}px) scale(${0.9 + 0.1 * p + 0.012 * settled * loopWave(t, 0.6)})`;
+  const glow = (90 + 38 * loopWave(t, 0.6)) / 255 * settled;
+  cta.style.boxShadow = `0 0 72px 6px color-mix(in srgb, var(--highlight) ${Math.round(glow * 100)}%, transparent)`;
+  enter($("note"), spring(t - S.note), 24);
+}
+{% endmacro %}

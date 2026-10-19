@@ -1,0 +1,15 @@
+{
+  "name": "Simplescale",
+  "handle": "@simplescale",
+  "url": "simplescale.io",
+  "voice": "Direct and practical. Short sentences, concrete numbers, no hype. Speaks to founders who run outbound themselves.",
+  "palette": {
+    "paper": "#ECEAE4",
+    "carbon": "#17181B",
+    "ink": "#17181B",
+    "muted": "#5C5D63",
+    "highlight": "#D2F84C",
+    "glow": "#B2A5FC",
+    "negative": "#C2413A"
+  }
+}

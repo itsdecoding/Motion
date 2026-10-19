@@ -1,0 +1,28 @@
+{% from "partials/orbit.html.j2" import orbit %}
+{% macro style() %}
+.cover { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 28px; }
+.cover .orbit { position: absolute; top: 0; right: 0; }
+.cover .badge { align-self: flex-start; margin-bottom: 20px; padding: 12px 26px; border: 2px solid var(--line); border-radius: 999px; font-size: 26px; font-weight: 600; color: var(--fg); }
+.cover .accent { color: var(--highlight); margin-top: -12px; }
+.cover .body { margin-top: 12px; }
+{% endmacro %}
+
+{% macro markup(s) %}
+<div class="cover">
+  {{ orbit(320) }}
+  <span class="badge" data-qa="badge">{{ s.badge }}</span>
+  <h1 class="headline" data-qa="headline">{{ s.headline }}</h1>
+  <p class="accent" data-qa="accent">{{ s.headline_accent }}</p>
+  {% if s.subline %}<p class="body" data-qa="subline">{{ s.subline }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro script(s) %}
+function stage(t) {
+  orbit(t, S.orbit);
+  enter($("badge"), spring(t - S.badge), 24);
+  enter($("headline"), spring(t - S.headline), 56, 14);
+  enter($("accent"), spring(t - S.accent), 56, 14);
+  enter($("subline"), spring(t - S.subline), 28);
+}
+{% endmacro %}

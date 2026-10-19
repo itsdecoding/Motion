@@ -1,0 +1,31 @@
+{% macro style() %}
+.stagger { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.stagger .line { font-size: 112px; }
+.stagger .accent.line { font-size: 124px; color: var(--soft); }
+.stagger .mask { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 0.08em 0.14em 0; margin: 0 0 -0.14em 0; }
+.stagger .word { display: inline-block; }
+.stagger .body { margin-top: 44px; }
+{% endmacro %}
+
+{% macro markup(s) %}
+<div class="stagger">
+  {% for line in s.lines %}
+  <p class="line {{ 'accent' if loop.last and not loop.first else 'headline' }}" data-qa="line-{{ loop.index }}">
+    {%- for word in line.split() %}<span class="mask"><span class="word">{{ word }}</span></span>{{ ' ' if not loop.last }}{% endfor -%}
+  </p>
+  {% endfor %}
+  {% if s.body %}<p class="body" data-qa="body">{{ s.body }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro script(s) %}
+const WORDS = [...document.querySelectorAll(".stagger .word")];
+function stage(t) {
+  WORDS.forEach((w, i) => {
+    const p = spring(t - S.words[i], 270, 20);
+    w.style.transform = `translateY(${(1 - p) * 105}%)`;
+    w.style.opacity = clamp(p * 1.5);
+  });
+  enter($("body"), spring(t - S.body), 28);
+}
+{% endmacro %}

@@ -1,0 +1,57 @@
+{
+  "title": "Outbound that books meetings",
+  "brand": {
+    "name": "Simplescale",
+    "handle": "@simplescale",
+    "url": "simplescale.io",
+    "voice": "Direct and practical. Short sentences, concrete numbers, no hype. Speaks to founders who run outbound themselves.",
+    "palette": {
+      "paper": "#ECEAE4",
+      "carbon": "#17181B",
+      "ink": "#17181B",
+      "muted": "#5C5D63",
+      "highlight": "#D2F84C",
+      "glow": "#B2A5FC",
+      "negative": "#C2413A"
+    }
+  },
+  "slides": [
+    {
+      "type": "cover_hero",
+      "badge": "Outbound playbook",
+      "headline": "Stop sending 500 emails a day.",
+      "headline_accent": "Send 40 good ones.",
+      "subline": "How small teams book more meetings with less volume."
+    },
+    {
+      "type": "word_stagger",
+      "lines": [
+        "Volume is not",
+        "a strategy.",
+        "Relevance is."
+      ],
+      "body": "Reply rates fall below 1% once you pass a few hundred sends a day. Targeting is the lever that moves them."
+    },
+    {
+      "type": "comparison_split",
+      "title": "What changes when you send less",
+      "old_points": [
+        "Scraped lists of 10,000 contacts",
+        "One template for every prospect",
+        "Measured by emails sent"
+      ],
+      "new_points": [
+        "40 accounts with a clear trigger",
+        "A first line written for each person",
+        "Measured by meetings booked"
+      ]
+    },
+    {
+      "type": "outro_cta",
+      "headline": "Want the full playbook?",
+      "headline_accent": "It’s free.",
+      "cta": "Comment “OUTBOUND”",
+      "note": "I’ll send you the templates and the targeting checklist."
+    }
+  ]
+}

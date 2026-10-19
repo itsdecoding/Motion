@@ -1,0 +1,11 @@
+{% macro orbit(size) %}
+<svg class="orbit" viewBox="-180 -180 360 360" width="{{ size }}" height="{{ size }}" aria-hidden="true">
+  <g class="ring-a"><circle r="168" fill="none" stroke="var(--glow)" stroke-width="4" stroke-dasharray="1 22" stroke-linecap="round"/></g>
+  <g class="ring-b">
+    <circle r="116" fill="none" stroke="var(--line)" stroke-width="2"/>
+    <circle cx="116" r="10" fill="var(--highlight)"/>
+    <circle cx="-58" cy="100" r="7" fill="var(--glow)"/>
+  </g>
+  <circle class="core" r="54" fill="var(--highlight)"/>
+</svg>
+{% endmacro %}
